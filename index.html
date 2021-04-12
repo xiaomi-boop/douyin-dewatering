@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="referrer" content="no-referrer"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.js"></script>
+  <title>Document</title>
+</head>
+<body>
+  <div class="container">
+    <div class="child1">
+      <input type="text" id="textarea" placeholder="请输入抖音分享码">
+      <button id="btn">点击</button>
+    </div>
+    <div id="child2">
+      <div>暂无视频</div>
+    </div>
+  </div>
+</body>
+<script>
+  
+  $('#btn').click(async function() {
+    const text = $('#textarea').val()
+    const { data } = await axios({
+      method: 'post',
+      url: 'http://127.0.0.1:3000/watermark',
+      data: {
+        text
+      }
+    })
+    if (data.respCode == 200) {
+      var child2 = document.getElementById('child2');
+      child2.innerHTML = `<video width="100%" height="100%" src="${data.respData}" controls="controls">
+      </video>`
+    }
+    console.log(data);
+  })
+</script>
+<style>
+  html,body {
+    width: 100%;
+    height: 100vh;
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+  }
+  .container {
+    width:  60rem;
+    height: 40rem;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    padding: 1rem;
+  }
+  .child1 {
+    align-self: center;
+    display: flex;
+  }
+  .child1 button {
+    align-self: center;
+    margin-left: 1rem;
+    cursor: pointer;
+    width: 5rem;
+    height: 1.8rem;
+    line-height: 1.8rem;
+    border: 0px;
+    background-color: rgb(207, 20, 20);
+    outline:none;
+    color: white;
+    border-radius: 0.1rem;
+  }
+  .child1 button:hover {
+    background-color: rgb(58, 144, 224);
+  }
+  .child1 input {
+    align-self: center;
+    border:0;
+    height: 2rem;
+    line-height: 2rem;
+    width: 30rem;
+    border-radius:5px;
+    background-color:rgba(241,241,241,.98);
+    resize: none;
+    outline:none;
+    padding-left: 0.5rem;
+  }
+  #child2 {
+    display: flex;
+    margin-top: 1rem;
+    justify-content: center;
+    align-self: center;
+    min-width: 80%;
+    height: 60%;
+    border: 1px solid red;
+  }
+  #child2 div {
+    align-self: center;
+    font-size: 3rem;
+    color: tomato;
+  }
+</style>
+</html>
