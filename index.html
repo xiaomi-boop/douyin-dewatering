@@ -1,18 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="referrer" content="no-referrer"/>
+  <meta name="referrer" content="no-referrer" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.6.0/jquery.js"></script>
   <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.js"></script>
   <title>Document</title>
 </head>
+
 <body>
   <div class="container">
+    <div id="tag">
+      <ul>
+        <li class="li" value="1">抖音</li>
+        <li class="li" value="2">快手</li>
+      </ul>
+    </div>
     <div class="child1">
-      <input type="text" id="textarea" placeholder="请输入抖音分享码">
+      <input type="text" id="dytextarea" placeholder="请输入抖音分享码">
+      <input type="text" id="kstextarea" placeholder="请输入快手分享码">
       <button id="btn">点击</button>
     </div>
     <div id="child2">
@@ -21,26 +30,78 @@
   </div>
 </body>
 <script>
-  
-  $('#btn').click(async function() {
-    const text = $('#textarea').val()
-    const { data } = await axios({
-      method: 'post',
-      url: 'http://127.0.0.1:3000/watermark',
-      data: {
-        text
-      }
-    })
-    if (data.respCode == 200) {
-      var child2 = document.getElementById('child2');
-      child2.innerHTML = `<video width="100%" height="100%" src="${data.respData}" controls="controls">
+
+  let text = ''
+  let res = ''
+
+  $('#btn').click(async function () {
+    switch (window.localStorage.getItem('type')) {
+      case '1':
+        text = $('#dytextarea').val()
+        res = await axios({
+          method: 'post',
+          url: 'http://127.0.0.1:3000/watermark',
+          data: {
+            text
+          }
+        })
+        if (res.data.respCode == 200) {
+          var child2 = document.getElementById('child2');
+          child2.innerHTML = `<video width="100%" height="100%" src="${res.data.respData}" controls="controls">
       </video>`
+        }
+        break;
+      case '2':
+        text = $('#kstextarea').val()
+        res = await axios({
+          method: 'post',
+          url: 'http://127.0.0.1:3000/ksVideo',
+          data: {
+            text
+          }
+        })
+        if (res.data.respCode == 200) {
+          var child2 = document.getElementById('child2');
+          child2.innerHTML = `<video width="100%" height="100%" src="${res.data.respData}" controls="controls">
+      </video>`
+        }
+        break;
     }
-    console.log(data);
+  })
+
+  window.onload = function() {
+    console.log(1);
+    $("#tag li").first().addClass("tagBgc")
+    window.localStorage.setItem('type', 1)
+    $("#kstextarea").css('display', 'none')
+  }
+
+
+  $('#tag li').click(function (e) {
+    const code = e.target.attributes[1].value
+    window.localStorage.setItem('type', code)
+    console.log(e);
+    $('li').removeClass('tagBgc')
+    $(this).addClass("tagBgc")
+
+    var child2 = document.getElementById('child2');
+    child2.innerHTML = '<div>暂无视频</div>'
+
+    $("#dytextarea").val('')
+    $("#kstextarea").val('')
+
+    if(code == 1) {
+      $("#kstextarea").css('display', 'none')
+      $("#dytextarea").css('display', 'inline-block')
+    } else {
+      $("#kstextarea").css('display', 'inline-block')
+      $("#dytextarea").css('display', 'none')
+    }
   })
 </script>
 <style>
-  html,body {
+  html,
+  body {
     width: 100%;
     height: 100vh;
     margin: 0px;
@@ -49,18 +110,71 @@
     flex-direction: row;
     justify-content: center;
   }
+
+  .li {
+    background-color: rgb(181, 182, 185);
+  }
+
+  #tag {
+    margin-bottom: 3rem;
+    display: flex;
+    justify-content: center;
+  }
+
+  .tagBgc {
+    background-color: rgb(207, 20, 20);
+  }
+
+  #tag ul {
+    width: 50rem;
+    height: 2.5rem;
+    line-height: 2.5rem;
+    list-style: none;
+    text-align: center;
+    margin: 0px;
+    padding: 0px;
+    display: flex;
+    justify-content: center;
+  }
+
+  #tag ul li {
+    flex: 1 1 auto;
+    border: 0.5px solid rgb(231, 230, 230);
+    cursor: pointer;
+    color: rgba(241, 241, 241, .98);
+    align-self: center;
+  }
+
+  #tag ul li:hover {
+    animation: 5s;
+    -webkit-animation: 5s;
+    /* Safari 和 Chrome */
+    background-color: rgb(58, 144, 224);
+  }
+
+  #tag ul li:nth-child(1) {
+    border-bottom: 0px;
+    border-right: 0px;
+  }
+
+  #tag ul li:nth-child(2) {
+    border: 0.5px 0.5px 0.5px 0px;
+  }
+
   .container {
-    width:  60rem;
+    width: 60rem;
     height: 40rem;
     align-self: center;
     display: flex;
     flex-direction: column;
     padding: 1rem;
   }
+
   .child1 {
     align-self: center;
     display: flex;
   }
+
   .child1 button {
     align-self: center;
     margin-left: 1rem;
@@ -70,25 +184,28 @@
     line-height: 1.8rem;
     border: 0px;
     background-color: rgb(207, 20, 20);
-    outline:none;
+    outline: none;
     color: white;
     border-radius: 0.1rem;
   }
+
   .child1 button:hover {
     background-color: rgb(58, 144, 224);
   }
+
   .child1 input {
     align-self: center;
-    border:0;
+    border: 0;
     height: 2rem;
     line-height: 2rem;
     width: 30rem;
-    border-radius:5px;
-    background-color:rgba(241,241,241,.98);
+    border-radius: 5px;
+    background-color: rgba(241, 241, 241, .98);
     resize: none;
-    outline:none;
+    outline: none;
     padding-left: 0.5rem;
   }
+
   #child2 {
     display: flex;
     margin-top: 1rem;
@@ -98,10 +215,12 @@
     height: 60%;
     border: 1px solid red;
   }
+
   #child2 div {
     align-self: center;
     font-size: 3rem;
     color: tomato;
   }
 </style>
+
 </html>
